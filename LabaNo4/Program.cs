@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,141 +9,95 @@ namespace LabaNo4
     {
         static void Main(string[] args)
         {
-            // 1. Ввод двух списков с проверкой корректности
+            //// 1. Ввод двух списков с проверкой корректности
+
             Console.WriteLine("Введите элементы первого списка через пробел:");
-            List<int> L1 = Lab.ReadListFromConsole();
+            List<string> L1 = Lab.ReadListFromConsole<string>();
 
             Console.WriteLine("Введите элементы второго списка через пробел:");
-            List<int> L2 = Lab.ReadListFromConsole();
+            List<string> L2 = Lab.ReadListFromConsole<string>();
 
             Console.WriteLine("Результат объединения списков:");
-            foreach (int i in Lab.Insert(L1, L2))
+            foreach (string item in Lab.Insert(L1, L2))
             {
-                Console.Write(i + " ");
+                Console.Write(item + " ");
             }
             Console.WriteLine();
 
-            // 2. Ввод связного списка с проверкой корректности
-            Console.WriteLine("Введите элементы связного списка через пробел:");
-            LinkedList<int> L = new LinkedList<int>(Lab.ReadListFromConsole());
+            Console.WriteLine("Введите элементы списка через пробел:");
+            string input = Console.ReadLine(); // Читаем строку из ввода
+            string[] elements = input.Split(' '); // Разделяем строку на элементы
 
-            Console.WriteLine("Результат подсчета одинаковых соседей:");
-            Console.WriteLine(Lab.Sosed(L));
+            // Создаём связный список на основе введённых элементов
+            var list = new LinkedList<string>(elements);
 
+            // Вызываем метод Sosed
+            int result = Lab.Sosed(list);
 
-
-            ////1
-
-            //List<int> L1 = new List<int>(new int[5] { 1, 2, 5, 6, 7 });
-            //List<int> L2 = new List<int>(new int[3] { 3, 4, 8 });
-            //foreach (int i in Lab.Insert(L1, L2))
-            //{
-            //    Console.Write(i + " ");
-            //}
-            //Console.WriteLine();
-
-            ////2
-
-            //LinkedList<int> L = new LinkedList<int>(new int[6] { 1, 2, 1, 5, 6, 5 });
-            //Console.WriteLine(Lab.Sosed(L));
-
-            //3
+            // Выводим результат
+            Console.WriteLine($"Количество узлов, удовлетворяющих условию: {result}");
 
 
-            // Заданный массив блюд
-            string[] dishes = { "Рис", "Картошка", "Курица", "Селедка", "Пельмени", "Дранники" };
-
-            // Список заказов 
-            List<List<string>> orders = new List<List<string>>
-            {
-                new List<string> { "Рис", "Картошка" },
-                new List<string> { "Картошка", "Курица", "Селедка" },
-                new List<string> { "Картошка", "Пельмени" }
-            };
-
-            HashSet<string> allOrders;
-            HashSet<string> someOrders;
-            HashSet<string> noOrders;
-
-            Lab.OrderAnalyze(dishes, orders, out allOrders, out someOrders, out noOrders);
-
-            Console.WriteLine("Все посетители заказали:");
-            foreach (string food in allOrders)
-            {
-                Console.WriteLine(food);
-            }
-
-            Console.WriteLine("\nХоть один посетитель заказал:");
-            foreach (string food in someOrders)
-            {
-                Console.WriteLine(food);
-            }
-
-            Console.WriteLine("\nНикто не заказал:");
-            foreach (string food in noOrders)
-            {
-                Console.WriteLine(food);
-            }
-
-
-            //4
-
-            string filePath = "text.txt";
-            string text = File.ReadAllText(filePath); //читает все содержимое файла в строку text
-            Console.WriteLine(Lab.Chars(text));
         }
     }
 
 
     class Lab
     {
-        public static List<int> Insert(List<int> L1, List<int> L2) //nomer 1
+        public static List<T> Insert<T>(List<T> L1, List<T> L2) where T : IComparable<T>
         {
-            List<int> l = new List<int>(); //новый список в котором будут содержаться все элементы 2-х спискаов по возростанию
+            List<T> result = new List<T>();
 
-            int index1 = 0, index2 = 0; //начинаем просмотр с 0 элементов
-            while (index1 < L1.Count && index2 < L2.Count) //пока индекс 1-го и 2-го списка мельше длинны этих списков
+            int index1 = 0, index2 = 0;
+
+            while (index1 < L1.Count && index2 < L2.Count)
             {
-                if (L1[index1] <= L2[index2]) //если эелемент 1-го списка не привышает соответствующий элемент 2-го списка
+                if (L1[index1].CompareTo(L2[index2]) <= 0) // Сравнение для обобщенного типа
                 {
-                    l.Add(L1[index1]); //добавляем в новый список меньший элемент (элемент 1-го списка)
-                    index1++; //увиличиваем читаемый индекс первого списка на 1
+                    result.Add(L1[index1]);
+                    index1++;
                 }
                 else
                 {
-                    l.Add(L2[index2]); //в ином случае добавляем соответствующий элемент 2-го списка
-                    index2++; //увиличиваем читаемый индекс 2 списка на 1
+                    result.Add(L2[index2]);
+                    index2++;
                 }
             }
-            //когда этот цикл заканчивается начинается следующий 
 
-            while (index1 < L1.Count) //пока индекс 1 списка менльше длинны списка
+            while (index1 < L1.Count)
             {
-                l.Add(L1[index1]); //добавляем элемент 1 списка
-                index1++; //увиличиваем читаемый индекс первого списка на 1
+                result.Add(L1[index1]);
+                index1++;
             }
-            //когда этот цикл заканчивается начинается следующий 
 
-            while (index2 < L2.Count)//пока индекс 2 списка менльше длинны списка
+            while (index2 < L2.Count)
             {
-                l.Add(L2[index2]); //добавляем элемент 2 списка
-                index2++; //увиличиваем читаемый индекс 2 списка на 1
+                result.Add(L2[index2]);
+                index2++;
             }
-            return l;
+
+            return result;
         }
 
-        public static int Sosed(LinkedList<int> L) //nomer 2
+        public static int Sosed<T>(LinkedList<T> list) // Метод работает с любыми типами данных
         {
-            LinkedListNode<int> node = L.First.Next;
+            if (list == null || list.Count < 3) // Проверяем, что список не null и содержит минимум 3 элемента
+            {
+                return 0;
+            }
+
+            LinkedListNode<T> node = list.First.Next;
             int count = 0;
+
             while (node.Next != null)
             {
-                if (node.Previous.Value == node.Next.Value)
+                if (EqualityComparer<T>.Default.Equals(node.Previous.Value, node.Next.Value))
                 {
                     count++;
                 }
                 node = node.Next;
             }
+
             return count;
         }
 
@@ -250,44 +204,28 @@ namespace LabaNo4
 
 
         //метод для ввода списков для 1 и 2 с клавиатуры
-        public static List<int> ReadListFromConsole()
+        public static List<T> ReadListFromConsole<T>()
         {
-            List<int> result = new List<int>();
+            List<T> result = new List<T>();
 
             while (true)
             {
                 try
                 {
                     string input = Console.ReadLine();
-                    string currentNumber = "";
-                    for (int i = 0; i < input.Length; i++)
-                    {
-                        if (input[i] == ' ') //если текущий символ - пробел 
-                        {
-                            if (!string.IsNullOrEmpty(currentNumber)) //проверяем есть ли currentNumber какое-либо число 
-                            {
-                                result.Add(int.Parse(currentNumber)); //преобразуем строку в число
-                                currentNumber = ""; //очищаем временную переменную
-                            }
-                        }
-                        else
-                        {
-                            currentNumber += input[i]; //если символ не пробел, добавляем к текущемму числу
-                        }
-                    }
+                    string[] elements = input.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-                    //добавление последнего числа (если есть)
-                    if (!string.IsNullOrEmpty(currentNumber)) //проверяем есть ли ещё числа
+                    foreach (string element in elements)
                     {
-                        result.Add(int.Parse(currentNumber)); //добавляем, если есть
+                        result.Add((T)Convert.ChangeType(element, typeof(T))); // Преобразование строки в нужный тип
                     }
 
                     return result;
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine("Ошибка ввода! Убедитесь, что вводите только целые числа, разделенные пробелами. Повторите попытку:");
-                    result.Clear(); //Очистка списка для повторного ввода
+                    Console.WriteLine($"Ошибка ввода! Убедитесь, что вводите данные корректного типа ({typeof(T).Name}). Повторите попытку:");
+                    result.Clear(); // Очистка списка для повторного ввода
                 }
             }
         }
